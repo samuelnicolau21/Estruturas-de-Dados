@@ -1,0 +1,117 @@
+#include <cstdio>
+#include <cstdlib>
+
+
+class no{
+public:
+
+double conteudo;
+no * prox;
+no * ant;
+
+};
+
+class Deque{
+public:
+
+no * esq;
+no * dir;
+
+void deque(){
+esq=NULL;
+dir=esq;
+}
+void _deque(no * x){
+  delete x ;
+}
+bool vazio(){
+  if(dir==NULL && esq==NULL){
+    return true;
+  }
+   return false;
+}
+void insere_esq(double x){
+  no * aux=new no;
+  aux->conteudo=x;
+  
+  if(vazio()==true){
+esq=aux;
+dir=aux;
+printf("esq=%lf\n",esq->conteudo);
+}
+  
+  else{
+  aux->prox=esq;
+  esq->ant=aux;
+  esq=aux;
+  printf("esq=%lf\n",esq->conteudo);
+  }
+
+}
+void insere_dir(double x){
+
+  no * aux=new no;
+  aux->conteudo=x;
+  
+  if(vazio()==true){
+esq=aux;
+dir=aux;
+printf("dir=%lf\n",dir->conteudo);
+}
+  
+  else{
+  aux->ant=dir;
+  dir->prox=aux;
+  dir=aux;
+  printf("dir=%lf\n",esq->conteudo);
+  }
+
+}
+no * remove_esq(){
+  if(vazio()==false){ 
+no * aux, * aux2;
+aux=esq->prox;
+aux2=esq;
+if(dir!=esq){aux->ant=NULL;}
+esq=aux;
+return aux2;
+    }
+  return 0;
+}
+no * remove_dir(){
+  if(vazio()==false){
+no * aux, * aux2;
+aux=dir->ant;
+aux2=esq;
+if(dir!=esq){aux->prox=NULL;}
+dir=aux;
+return aux2;
+}
+  return 0;}
+void mostra_deque(){
+  if(vazio()==false){ 
+  no * aux;
+  aux=esq;
+  while(aux!=NULL){
+  printf("%lf ",aux->conteudo);
+  aux=aux->prox;
+  }
+}
+  }
+};
+
+
+
+int main(){
+
+Deque d;
+d.deque();
+
+d.insere_esq(33);
+d.mostra_deque();  
+getchar();  
+d._deque(d.remove_dir());
+printf("oi\n");
+  
+  return 0;
+  }
