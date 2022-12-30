@@ -1,0 +1,112 @@
+#include <cstdio>
+#include <cstdlib>
+
+// tipos novos que tive que criar: tipo nó e o tipo fila
+struct Noh{
+int c;//conteudo do nó
+Noh * prox;//endereço do nó que vem depois desse
+Noh *ant;//endereço do nó que vem antes desse
+}; 
+struct fila{
+Noh * primeiro=nullptr;//guarda o endereço para o primeiro noh da fila
+Noh * ultimo=nullptr;//guarda o endereço para o ultimo noh da fila
+
+};
+
+//funções ou métodos que tive que criar:
+//enfileirar, desenfileirar, listar e menu
+
+void enfileirar(fila *f,int c){
+Noh * novo= new Noh{c,nullptr,nullptr}; //cria a no que vou enfileirar
+
+/*se o primeiro da fila é nulo quer 
+dizer que a fila estava vazia e que o elemento 
+que vou enfileirar deve ser o primeiro e o último na fila*/
+if(f->primeiro==nullptr){
+  f->primeiro=novo;
+  f->ultimo=novo;
+   } 
+
+/*se a fila não estava vazia então o elemento que vou adcionar deve
+  logo após o último da fila. Após isso eu atualizo o último da fila para 
+  que ele seja o elemento que eu acabei de adcionar*/
+else{
+    f->ultimo->prox=novo;
+    f->ultimo->prox->ant=f->ultimo;
+    f->ultimo=f->ultimo->prox;
+  }
+   
+  
+};
+void desenfileirar(fila *f){
+  //guardo o primeiro elemento da fila para apagálo posteriormente
+  Noh* del=f->primeiro;
+  //o primeiro passa a ser o elemento que vem depois do atual primeiro
+  f->primeiro=f->primeiro->prox;
+  //delete o antigo primeiro pois ele deve sair da fila
+  delete del;
+};
+void listar(fila *f){
+  //crio um ponteiro para um nó chamado atual
+  //nesse nó eu guardo o primeiro da fila
+  Noh * atual=f->primeiro;
+  //crio um laço que vai rodar enquanto o atual for diferente de nulo
+  while(atual!=nullptr){
+    //mostro o conteudo do nó atual na tela
+    printf("%d ",atual->c);
+    //faço o nó atual ser o próximo no da fila e repito o processo
+    atual=atual->prox;
+  }
+  //faço saltar uma linha  depois de mostrar toda a lista
+  printf("\n"); 
+  
+};
+void menu(){
+  printf("MENU\n");
+  printf("1-Enfileirar\n");
+  printf("2-desenfileirar\n");
+  printf("3-listar\n");
+  printf("4-sair\n");};
+
+//função principal
+int main(){
+  fila f ;
+  int e=0,x;
+  
+  while(e!=4){ 
+  menu();
+  scanf("%d",&e);
+  system("clear");
+  switch (e){
+   case 1:
+     printf("digite o valor que deseja enfileirar\n");
+     scanf("%d",&x);
+     enfileirar(&f,x);
+     system("clear");
+   break;
+
+   case 2:
+     desenfileirar(&f);
+     getchar();
+     system("clear");
+     
+   break;
+
+   case 3:
+    listar(&f);
+     getchar();
+     getchar();
+     system("clear");
+     
+   break;
+  
+  default:
+     printf("opção inválida\n");
+     getchar();
+     system("clear");
+     }
+  }
+
+  return 0;
+  
+}
