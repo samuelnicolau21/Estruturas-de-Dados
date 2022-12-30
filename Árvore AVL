@@ -1,0 +1,293 @@
+#include <cstdio>
+
+
+struct ArvoreAVL{
+struct Noh{int conteudo; int alt; Noh * esq, *dir;};
+Noh * raiz, sent;
+
+//construtor
+ArvoreAVL(){
+  raiz=&sent;
+  sent.conteudo=0;
+  sent.alt=-1;
+  sent.esq=&sent;
+  sent.dir=&sent;
+}
+
+//destrutor
+~ArvoreAVL(){
+  aux_destrutor(raiz);
+}
+void aux_destrutor(Noh *n){
+  if(n!=&sent){
+    aux_destrutor(n->esq);
+    aux_destrutor(n->dir);
+    delete n;
+  }
+}
+
+//inserir
+void inserir(int c){
+  Noh* novo=new Noh{c,0,&sent,&sent};
+
+  if(raiz==&sent){
+    raiz=novo;
+    return;
+  }
+  Noh **pai=&raiz;
+  aux_inserir(pai,novo);
+  altura(*pai);
+  corrigir(pai);
+  
+}
+void aux_inserir(Noh **pai, Noh* novo){
+  if(novo->conteudo<(*pai)->conteudo){
+    if((*pai)->esq!=&sent){
+      pai=&(*pai)->esq;
+      aux_inserir(pai,novo);
+    }
+    else{(*pai)->esq=novo;}
+  }
+  else{
+    if((*pai)->dir!=&sent){
+      pai=&(*pai)->dir;
+      aux_inserir(pai,novo);
+    }
+    else{(*pai)->dir=novo;}
+  }
+
+  altura(*pai);
+  corrigir(pai);
+}
+
+//corrigir
+void corrigir(Noh **pai){
+  Noh **aux=pai;
+
+  //descobre onde é o desbalanço
+  if(bal(*pai)>1){
+    //desbalanço na arv esq
+    if(bal((*pai)->esq)>0){
+    //rotação simples à dir
+      rot_dir(pai);
+    }
+    else{
+    //rotação dupla à dir
+      Noh **pai2=&(*pai)->esq;
+      rot_esq(pai2);
+      rot_dir(pai); 
+    }
+    
+  }
+  else if(bal(*pai)<-1){
+    //desbalaço na arv dir
+    if(bal((*pai)->dir)<0){
+      //rotação simples à esq
+      rot_esq(pai);
+    }
+    else{
+      Noh **pai2=&(*pai)->esq;
+      rot_dir(pai2);
+      rot_esq(pai);
+      //rotação dupla à esq
+      
+    }
+  }
+
+  //corrige a altura dos nós após a correção do balanço
+  if (bal(*pai)>1||bal(*pai)<-1){
+    altura((*pai)->esq);
+    altura((*pai)->dir);
+    altura(*pai);
+  }
+
+  //atualiza o ponteiro da raiz se a raiz mudou
+  if(aux==&raiz){
+    raiz=*pai;
+  }
+}
+void rot_esq(Noh **pai){
+  Noh * aux=*pai, *aux2=(*pai)->dir->esq;
+  *pai=(*pai)->dir;
+  (*pai)->esq=aux;
+  aux->dir=aux2;
+}
+void rot_dir(Noh **pai){
+  Noh *aux=*pai, *aux2=(*pai)->esq->dir;
+  *pai=(*pai)->esq;
+  (*pai)->dir=aux;
+  aux->esq=aux2;
+  
+}
+int bal(Noh *n){
+  int b=(n->esq->alt+1)-(n->dir->alt+1);
+  return b;
+}
+void altura(Noh *n){
+  if(n!=&sent){
+    if(n->esq->alt>=n->dir->alt){
+      n->alt=n->esq->alt+1;
+    }
+    else{n->alt=n->dir->alt+1;}
+  }
+}
+
+//remover
+Noh* remover(int c){
+  Noh ** pai=&raiz;
+  if(raiz==&sent){return nullptr;}
+  
+  aux_remover(pai,c,0);
+  
+  printf("*pai depois do aux_remover eh %d\n",(*pai)->conteudo);
+  altura(*pai);
+  corrigir(pai);
+  printf("*pai final eh %d\n",(*pai)->conteudo);
+  getchar();
+  printf("raiz=%d\n",raiz->conteudo);
+  printf("pai=%d(%d), esq=%d(%d), dir=%d(%d)\n",(*pai)->conteudo,(*pai)->alt,(*pai)->esq->conteudo,(*pai)->esq->alt,(*pai)->dir->conteudo,(*pai)->dir->alt);
+  getchar();
+  
+  return *pai;
+  
+}
+void  aux_remover(Noh **pai,int c,int flag){
+  
+  if(c<(*pai)->conteudo){
+    printf("c < %d\n",(*pai)->conteudo);
+    if((*pai)->esq!=&sent){
+      printf("esq de %d eh %d\n",(*pai)->conteudo,(*pai)->esq->conteudo);
+      printf("*pai eh %d\n",(*pai)->conteudo);
+      Noh *aux=*pai;
+      printf("aux antes do remover=%d\n",aux->conteudo);
+      aux_remover(&(*pai)->esq,c,flag);
+      *pai=aux;
+      printf("aux depois do remover=%d\n",aux->conteudo);
+      printf("*pai depois do remover eh %d\n",(*pai)->conteudo);}
+  }
+    
+  else if(c>(*pai)->conteudo){
+    printf("c > %d\n",(*pai)->conteudo);
+    if((*pai)->dir!=&sent){
+      printf("dir de %d eh %d\n",(*pai)->conteudo,(*pai)->dir->conteudo);
+      printf("*pai eh %d\n",(*pai)->conteudo);
+      Noh * aux=*pai;
+      printf("aux antes do remover=%d\n",aux->conteudo);
+      aux_remover(&(*pai)->dir,c,flag);
+      *pai=aux;
+      printf("aux depois do remover=%d\n",aux->conteudo);
+      printf("*pai depois do remover  eh %d\n",(*pai)->conteudo);
+    }
+  }
+
+  if((*pai)->conteudo==c){
+    printf("(*pai)->conteudo=%d\n",(*pai)->conteudo);
+    //se n tem  filho
+    if((*pai)->esq==&sent && (*pai)->dir==&sent){
+      printf("%d eh Noh folha",(*pai)->conteudo);
+      getchar();
+      Noh *del=*pai;
+      *pai=(*pai)->esq;
+      if(*pai==&sent){printf("eh sent\n");}
+      printf("%d foi deletado\n",del->conteudo);
+      getchar();
+      delete del;
+      
+    }
+    //se tem 2 filhos
+    else if((*pai)->esq!=&sent && (*pai)->dir!=&sent){
+      printf("%d eh pai de dois filhos\n",(*pai)->conteudo);
+      Noh * p=*pai,  * clone, * del=*pai;
+    
+      //acha predecessor
+      p=p->esq;
+      while(p->dir!=&sent){
+        p=p->dir;
+      }
+      
+      printf("encontrei o predecessor, é %d\n",p->conteudo);
+      clone = new Noh{p->conteudo,p->alt,(*pai)->esq,(*pai)->dir};
+      *pai=clone;
+      printf("%d é o novo *pai\n",(*pai)->conteudo);
+      getchar();
+      
+      printf("vou remover %d\n",(*&p)->conteudo);
+      getchar();
+      aux_remover(&p,(*&p)->conteudo,flag);
+      
+      
+      printf("raiz=%d\n",raiz->conteudo);
+      printf("del=%d\n",del->conteudo);
+      if(del==raiz){
+        printf("a raiz agora vai apontar para %d\n",(*pai)->conteudo);
+        raiz=*pai;}
+      getchar();
+      printf("%d foi deletado\n",del->conteudo);
+      delete del;
+      
+      
+    }
+    //se tem filho esq
+    else if((*pai)->esq!=&sent){
+      printf("%d tem filho esquerdo\n",(*pai)->conteudo);
+      Noh * del=*pai;
+      *pai=(*pai)->esq;
+      printf("%d foi deletado\n", del->conteudo);
+      getchar();
+      delete del;
+      return *pai;
+    }
+    else if((*pai)->dir!=&sent){
+      printf("%d tem filho esquerdo\n",(*pai)->conteudo);
+      Noh * del=*pai;
+      *pai=(*pai)->dir;
+      printf("%d foi deletado\n", del->conteudo);
+      getchar();
+      delete del;
+      return *pai;
+    }
+  }
+
+  if(*pai!=&sent){ 
+  printf("vou ajustar a altura de %d\n",(*pai)->conteudo);
+  altura(*pai);
+  printf("vou corrigir o balanço de %d\n",(*pai)->conteudo);
+  corrigir(pai);
+  printf("%d é o pai depois da correção\n",(*pai)->conteudo);
+  getchar();}
+  
+  
+}
+
+//mostrar 
+void mostra(){
+  aux_mostra(raiz);
+  printf("\n");
+} 
+void aux_mostra(Noh *n){
+  if(n!=&sent){
+    aux_mostra(n->esq);
+    printf("(%d)%d ",n->alt,n->conteudo);
+    aux_mostra(n->dir);
+  }
+}
+
+};
+
+int main() {
+  ArvoreAVL a;
+  ArvoreAVL();
+  a.inserir(11);
+  a.inserir(5);
+  a.inserir(13);
+  a.mostra();
+  a.remover(11);
+
+  
+  
+  
+  
+  
+  
+  return 0;
+}
