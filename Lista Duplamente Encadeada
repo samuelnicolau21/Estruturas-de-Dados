@@ -1,0 +1,110 @@
+#include <cstdio>
+#include <cstdlib>
+
+class no{
+public:
+int conteudo;
+no * prox=NULL;
+no * ant=NULL;
+
+};
+class lista{
+public:
+no * primeiro=NULL;
+int cont=0;
+
+void construtor_lista(){
+  primeiro=new no;
+  printf("digite o conteudo do primeiro nó\n");
+  scanf("%d",&primeiro->conteudo);
+  if(primeiro!=NULL){printf("deu certo construir\n");}
+  }
+
+int mostra_lista(no *primeiro, int n){
+   no * aux = primeiro;
+  for(int i=0;i<=n;i++){
+    printf("%d ",aux->conteudo);
+    aux=aux->prox;
+  }
+  
+  return 0;
+}   
+
+void inserir(int conteudo){
+  no * aux, *aux2;
+  no * p = new no;
+  p->conteudo=conteudo;
+  p->prox=primeiro->prox;
+  p->ant=primeiro;
+  primeiro->prox=p;
+  if(p->prox!=NULL){
+    p->prox->ant=p;
+  }
+  printf("acabei de inserir o nó de conteúdo %d\n",p->conteudo);
+  cont++;
+}
+//corrigir esse método
+no * remover(int x){
+  no * aux=primeiro, * aux2;
+  if(aux->conteudo==x){
+    primeiro=primeiro->prox;
+        return aux;  
+    }
+  if(aux!=NULL){
+    if(aux->conteudo==x){
+      aux2=aux;
+      aux->ant=aux->prox;
+      return aux2;
+    }
+    aux=aux->prox;
+  }
+  else if(aux==NULL && aux->conteudo==x){
+    aux2=aux;
+    aux->ant->prox=NULL;
+    return aux2;
+  }
+  return NULL;}
+    
+ 
+  
+
+};
+
+int main(){
+  int n,m;
+  no *p = new no;
+  lista l;
+
+  
+  //constoi lista criando o primeiro nó o l.primeiro
+  l.construtor_lista();
+  
+  printf("digite quantos nós vc deseja inserir na lista\n");
+  scanf("%d",&n);
+  //insere nó na lista
+  for(int i=0;i<n;i++){ 
+  printf("digite o nó que vc deseja inserir na lista\n");
+  scanf("%d",&p->conteudo);
+  l.inserir(p->conteudo);
+    }
+
+  
+  //mostra todos os elementos da lista
+  l.mostra_lista(l.primeiro, n);
+
+
+  printf("digite quantos nós vc deseja remover na lista\n");
+  scanf("%d",&m);
+  //remove nó da lista
+  for(int i=0;i<m;i++){ 
+  printf("digite o nó que vc deseja remover na lista\n");
+  scanf("%d",&p->conteudo);
+  p=l.remover(p->conteudo);
+    printf("%d foi removido\n",p->conteudo);
+    }
+
+  
+  //mostra todos os elementos da lista
+  l.mostra_lista(l.primeiro, n);
+
+return 0;  }
